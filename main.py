@@ -1,16 +1,11 @@
-# This is a sample Python script.
+# import mlflow
+# import mlflow.sklearn
+# from sklearn.datasets import load_diabetes
+# from sklearn.linear_model import LinearRegression
+# from sklearn.model_selection import train_test_split
+# from sklearn.metrics import mean_squared_error
+from utils.utils import train_with_mlflow
 
-# Press ⌃R to execute it or replace it with your code.
-# Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
-
-
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press ⌘F8 to toggle the breakpoint.
-
-
-# Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    print_hi('PyCharm')
+    train_with_mlflow()
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
