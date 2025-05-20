@@ -1,7 +1,9 @@
 import numpy as np
+import pytest
 from utils.utils import load_datasets
 
 
+@pytest.mark.unit
 def test_load_datasets():
     # Test with default parameters
     X_train, X_test, y_train, y_test = load_datasets()
