@@ -6,10 +6,24 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
 
 
-def train_with_mlflow():
-    # Load dataset
+def load_datasets(test_size=0.2, random_state=42):
+    """
+    Load the diabetes dataset and split it into training and test sets.
+    
+    Args:
+        test_size (float): Proportion of the dataset to include in the test split
+        random_state (int): Random state for reproducibility
+        
+    Returns:
+        tuple: (X_train, X_test, y_train, y_test) containing the train-test split
+    """
     X, y = load_diabetes(return_X_y=True)
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    return train_test_split(X, y, test_size=test_size, random_state=random_state)
+
+
+def train_with_mlflow():
+    # Get the data using the new function
+    X_train, X_test, y_train, y_test = load_datasets()
 
     input_example = X_test[:1]  # Use a single sample as input example
 
