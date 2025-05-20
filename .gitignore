@@ -18,3 +18,5 @@ mlruns/
 # Other common Python ignores
 *.log
 *.sqlite3
+.coverage
+coverage.xml
