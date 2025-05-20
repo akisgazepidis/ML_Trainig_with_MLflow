@@ -11,6 +11,8 @@ jobs:
     
     steps:
     - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
     
     - name: Set up Python 3.9
       uses: actions/setup-python@v2
@@ -49,9 +51,22 @@ jobs:
         
         git config --global user.name 'GitHub Actions'
         git config --global user.email 'actions@github.com'
+        
+        # Store current dev branch content
+        cp -r . /tmp/dev_content/
+        
+        # Switch to tst and merge dev with strategy-option theirs
         git fetch origin tst
         git checkout tst
-        git merge --no-ff --allow-unrelated-histories dev -m "Merge dev into tst: Deploy model updates"
+        git merge --no-ff --allow-unrelated-histories -X theirs dev -m "Merge dev into tst: Deploy model updates"
+        
+        # If merge failed, force update files from dev
+        if [ $? -ne 0 ]; then
+          echo "Merge failed, forcing update with dev content..."
+          cp -rf /tmp/dev_content/* .
+          git add .
+          git commit -m "Force update tst with dev content"
+        fi
         
         # Register new model version in MLflow
         python -c "
