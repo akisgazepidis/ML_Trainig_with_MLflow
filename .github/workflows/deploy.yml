@@ -1,4 +1,4 @@
-name: Deploy MLflow Model
+name: Deploy to Test Environment
 
 on:
   push:
@@ -29,21 +29,7 @@ jobs:
       run: |
         pytest tests/ -v --cov=utils --cov-report=xml -m "not unit"
         
-    - name: Train and validate model
-      run: |
-        python main.py
-        
-    - name: Check model performance
-      run: |
-        python -c "
-        import mlflow
-        runs = mlflow.search_runs()
-        latest_run = runs.iloc[0]
-        mse = latest_run['metrics.mse']
-        assert mse < 4000, f'Model performance below threshold: MSE = {mse}'
-        "
-        
-    - name: Deploy model to test environment
+    - name: Deploy to test environment
       run: |
         # Clean workspace
         git clean -fd
@@ -58,7 +44,7 @@ jobs:
         # Switch to tst and merge dev with strategy-option theirs
         git fetch origin tst
         git checkout tst
-        git merge --no-ff --allow-unrelated-histories -X theirs dev -m "Merge dev into tst: Deploy model updates"
+        git merge --no-ff --allow-unrelated-histories -X theirs dev -m "Merge dev into tst: Deploy code updates"
         
         # If merge failed, force update files from dev
         if [ $? -ne 0 ]; then
@@ -67,30 +53,5 @@ jobs:
           git add .
           git commit -m "Force update tst with dev content"
         fi
-        
-        # Register new model version in MLflow
-        python -c "
-        import mlflow
-        from mlflow.tracking import MlflowClient
-        
-        client = MlflowClient()
-        
-        # Try to get the registered model, create it if it doesn't exist
-        try:
-            client.get_registered_model('diabetes-model')
-        except mlflow.exceptions.MlflowException:
-            client.create_registered_model('diabetes-model')
-        
-        # Get latest run and create new version
-        runs = mlflow.search_runs()
-        latest_run = runs.iloc[0]
-        
-        model_uri = f'runs:/{latest_run.run_id}/model'
-        client.create_model_version(
-            name='diabetes-model',
-            source=model_uri,
-            run_id=latest_run.run_id
-        )
-        "
         
         git push origin tst
