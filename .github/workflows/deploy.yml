@@ -37,7 +37,8 @@ jobs:
         import mlflow
         runs = mlflow.search_runs()
         latest_run = runs.iloc[0]
-        assert latest_run.metrics.mse < 4000, 'Model performance below threshold'
+        mse = latest_run['metrics.mse']
+        assert mse < 4000, f'Model performance below threshold: MSE = {mse}'
         "
         
     - name: Deploy model to test environment
