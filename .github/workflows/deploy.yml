@@ -74,6 +74,14 @@ jobs:
         from mlflow.tracking import MlflowClient
         
         client = MlflowClient()
+        
+        # Try to get the registered model, create it if it doesn't exist
+        try:
+            client.get_registered_model('diabetes-model')
+        except mlflow.exceptions.MlflowException:
+            client.create_registered_model('diabetes-model')
+        
+        # Get latest run and create new version
         runs = mlflow.search_runs()
         latest_run = runs.iloc[0]
         
