@@ -13,6 +13,7 @@ jobs:
     - uses: actions/checkout@v2
       with:
         fetch-depth: 0
+        token: ${{ secrets.GH_PAT }}
     
     - name: Set up Python 3.9
       uses: actions/setup-python@v2
@@ -30,6 +31,8 @@ jobs:
         pytest tests/ -v --cov=utils --cov-report=xml -m "not unit"
         
     - name: Deploy to test environment
+      env:
+        GH_PAT: ${{ secrets.GH_PAT }}
       run: |
         # Clean workspace
         git clean -fd
@@ -37,6 +40,9 @@ jobs:
         
         git config --global user.name 'GitHub Actions'
         git config --global user.email 'actions@github.com'
+        
+        # Configure git to use the token
+        git remote set-url origin https://x-access-token:${GH_PAT}@github.com/${{ github.repository }}.git
         
         # Store current dev branch content
         cp -r . /tmp/dev_content/
